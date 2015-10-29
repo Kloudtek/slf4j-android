@@ -10,11 +10,12 @@ import android.util.Log;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 
 /**
  * Created by yannick on 10/28/15.
@@ -31,30 +32,36 @@ public class AndroidLoggerFactory implements ILoggerFactory {
     private final Level level;
 
     public AndroidLoggerFactory() {
-        final InputStream is = getClass().getResourceAsStream(CONFIG_FILE);
-        String tag = null;
-        Level level = null;
-        if (is != null) {
-            try {
-                Properties properties = new Properties();
-                properties.load(is);
-                tag = properties.getProperty(TAG);
-                String levelStr = properties.getProperty(LEVEL);
-                if (levelStr != null) {
-                    try {
-                        level = Level.valueOf(levelStr.toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        Log.e("SLF4J", "Invalid log level: " + levelStr);
+        final Properties properties = new Properties();
+        try {
+            Executors.newSingleThreadExecutor().submit(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    final InputStream is = getClass().getResourceAsStream(CONFIG_FILE);
+                    if (is != null) {
+                        properties.load(is);
+                        is.close();
                     }
+                    return null;
                 }
-            } catch (IOException e) {
-                Log.e("SLF4J", "Failed to load configuration file slf4j-android.properties: " + e.getMessage(), e);
+            }).get();
+        } catch (Exception e) {
+            Log.e("SLF4J", "Failed to load configuration file slf4j-android.properties: " + e.getMessage(), e);
+        }
+        Level level = null;
+        String tag = properties.getProperty(TAG);
+        String levelStr = properties.getProperty(LEVEL);
+        if (levelStr != null) {
+            try {
+                level = Level.valueOf(levelStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                Log.e("SLF4J", "Invalid log level: " + levelStr);
             }
         }
         if (tag != null) {
             this.tag = tag;
         } else {
-            this.tag = UNDEFINED;
+            this.tag = null;
         }
         if (level != null) {
             this.level = level;
