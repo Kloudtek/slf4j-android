@@ -39,7 +39,7 @@ public class AndroidLoggerFactory implements ILoggerFactory {
         if (level == null) {
             boolean debugEnabled = (0 != (ctx.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
             if (debugEnabled) {
-                AndroidLoggerFactory.level = Level.VERBOSE;
+                AndroidLoggerFactory.level = Level.DEBUG;
             } else {
                 AndroidLoggerFactory.level = Level.INFO;
             }
