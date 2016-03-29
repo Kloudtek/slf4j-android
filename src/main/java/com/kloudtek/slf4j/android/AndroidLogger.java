@@ -237,6 +237,11 @@ public class AndroidLogger extends MarkerIgnoringBase {
         if (isLoggable(priority)) {
             FormattingTuple ft = MessageFormatter.arrayFormat(format, argArray);
             doLog(priority, ft.getMessage(), ft.getThrowable());
+            if( AndroidLoggerFactory.extensions != null ) {
+                for (Extension extension : AndroidLoggerFactory.extensions) {
+                    extension.log(priority, name, ft.getMessage(), ft.getThrowable());
+                }
+            }
         }
     }
 
@@ -248,11 +253,7 @@ public class AndroidLogger extends MarkerIgnoringBase {
 
     private boolean isLoggable(int priority) {
         if (level != null) {
-            if (level == Level.AUTO) {
-                return factory.isDebugEnabled() || Log.INFO <= priority;
-            } else {
-                return level.getValue() <= priority;
-            }
+            return level.getValue() <= priority;
         } else {
             return Log.isLoggable(name, priority);
         }
