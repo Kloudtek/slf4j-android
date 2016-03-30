@@ -11,6 +11,27 @@
     <groupId>com.kloudtek.slf4j</groupId>
     <artifactId>slf4j-android</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <description>slf4j for android (includes support for crashlytics)</description>
+    <url>https://github.com/Kloudtek/slf4j-android</url>
+    <organization>
+        <name>Kloudtek</name>
+        <url>http://www.kloudtek.com</url>
+    </organization>
+    <developers>
+        <developer>
+            <name>Dev Team</name>
+            <organization>Kloudtek</organization>
+        </developer>
+    </developers>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/Kloudtek/slf4j-android/issues</url>
+    </issueManagement>
+    <scm>
+        <url>https://github.com/Kloudtek/slf4j-android</url>
+        <connection>scm:git:git@github.com:Kloudtek/slf4j-android.git</connection>
+        <developerConnection>scm:git:git@github.com:Kloudtek/slf4j-android.git</developerConnection>
+    </scm>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -89,18 +110,53 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.6</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <distributionManagement>
         <repository>
-            <id>kloudtek-oss-releases</id>
-            <name>Kloudtek OSS Releases Repository</name>
-            <url>${repo.oss.release.url}</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
-            <id>kloudtek-oss-snapshots</id>
-            <name>Kloudtek OSS Snapshots Repository</name>
-            <url>${repo.oss.snapshot.url}</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>${gpg.key}</keyname>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
