@@ -11,6 +11,7 @@
     <groupId>com.kloudtek.slf4j</groupId>
     <artifactId>slf4j-android</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>SLF4J android implementation</name>
     <description>slf4j for android (includes support for crashlytics)</description>
     <url>https://github.com/Kloudtek/slf4j-android</url>
     <organization>
